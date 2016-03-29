@@ -1,9 +1,7 @@
 ---
 title: "MMMILC Summary Report"
-
-date: "`r Sys.time()`"
 output: pdf_document
-
+date: '`r Sys.time()`'
 ---
 
 ```{r, echo = FALSE}
@@ -33,7 +31,7 @@ do.call(grid.arrange, c(timePlots))
 ```
 ```{r, echo = FALSE, message = FALSE, warning=FALSE}
 #print the two big plots
-p6
 p7
+p8
 ```
 
