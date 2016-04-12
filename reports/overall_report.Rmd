@@ -1,5 +1,6 @@
 ---
 title: "MMMILC Summary Report"
+subtitle: "\"Be brave. Take risks. Nothing can substitute experience\". -Paulo Coelho"
 output: pdf_document
 date: '`r Sys.time()`'
 ---

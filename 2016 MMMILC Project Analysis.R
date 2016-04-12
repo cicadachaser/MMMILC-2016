@@ -1,5 +1,7 @@
 #This is an R script to analyze the MMMILC Project data from 2016
 
+# header info -------------------------------------------------------------
+
 #clear all variables
 rm(list=ls())
 graphics.off()
@@ -13,21 +15,18 @@ library(plyr)
 library(gridExtra)
 library(ggmap)
 
-#clear variables
-rm(list=ls())
-graphics.off()
-pardefault <- par(no.readonly = T)
-
 #se function that removes NA's
 std.err <- function(x) sd(x[!is.na(x)])/sqrt(length(x[!is.na(x)]))
+
+# read data ---------------------------------------------------------------
 
 #setwd and load data
 setwd("C:\\Users\\louie\\Documents\\GitHub\\MMMILC-2016") #LHY desktop
 
 #load fake data, change the directory for the real data
-setwd("2016 TRIAL DATA") 
+setwd("2016 data") 
 mw.locs<-read.csv("milkweed coordinates 2015-05-23.csv")
-data<-read.csv("2016 MMMILC Project Data.csv",header=T,strip.white=T,na.strings= c(" ", "")) #observations
+data<-read.csv("2016 MMMILC Project Data 2016-04-04.csv",header=T,strip.white=T,na.strings= c(" ", "")) #observations
 setwd("..")
 
 #milkweed status to character  and monarch stage columns to character
@@ -45,9 +44,13 @@ data$leaf.damage <- as.numeric(gsub("%", "", data$leaf.damage))
 #date and time to date.time object
 data$date.time <- strptime(paste(data$date, data$time), format = "%m/%d/%Y %H:%M")
 data$julianDate <- as.numeric(strftime(data$date.time, format = "%j"))
+
+#re-order dataset in chronological order within teams
+data<-data[order(data$name.1,data$date.time),]
+
 #calculate the project.day and week
 data$project.day <- data$julianDate - min(data$julianDate) + 1
-data$week<-(data$project.day-1) %/% 7+1
+data$week<-as.integer((data$project.day-1) %/% 7+1)
 
 #####
 #need to create a proabable time spent on each milkweed
@@ -107,6 +110,15 @@ data$L4lengths <- sapply(1:nrow(data), function(x) c(monarchLengths[ x , which(g
 data$L5lengths <- sapply(1:nrow(data), function(x) c(monarchLengths[ x , which(grepl("L5", monarchStages[x , ]))]))
 
 data$catLengths <- sapply(1:nrow(data), function(x) c(monarchLengths[ x , which(grepl("[L1-5]", monarchStages[x , ]))]))
+
+#how many of the plants are NE?
+prop.ne.fun<-function (x) {sum(x=="N.E.")/length(x)}
+prop.ne.summ<-aggregate(milkweed.status~milkweed.ID, data=data, prop.ne.fun)
+colnames(prop.ne.summ)<-c("milkweed.ID","prop.ne")
+p1<- ggplot(prop.ne.summ, aes (x=milkweed.ID, y=prop.ne))
+p1+geom_point(aes(color=prop.ne,size=prop.ne))+scale_color_gradientn(colors=c("green","red"))
+
+# calculate participant metrics -------------------------------------------
 
 #function to call all observations from a student and summarize
 #add elements within this function to add rows to student summary table
@@ -246,16 +258,22 @@ last.week <- paste("week", " ", max(data$week), ": ", last.week[1], " - ",last.w
 
 ##################################################  
 
-#go to reports folder
-setwd("reports")
+# # create student reports --------------------------------------------------
+# 
+# 
+# #go to reports folder
+# setwd("reports")
+# 
+# for(i in 1:length(name.list)){
+#   student.name <- name.list[i]
+#   render(input = "student_report.Rmd", output_format = "pdf_document",
+#          output_file = file.names.list[i] )
+# }
+# 
+# setwd("..")
 
-for(i in 1:length(name.list)){
-  student.name <- name.list[i]
-  render(input = "student_report.Rmd", output_format = "pdf_document", 
-         output_file = file.names.list[i] )
-}
+# calculate overall metrics -----------------------------------------------
 
-setwd("..")
 
 #overall summary report
 #calculate summary statistics, turn them into a data.frames for a table at top of report
@@ -346,7 +364,7 @@ p6 <- p6+geom_point(col="red")+geom_line()+geom_hline(yintercept=318,lty='dashed
   scale_x_continuous(breaks=c(1:max(data$week)))+ylab("Larvae per week")
 
 #put weekly plots together for overall report
-weekSummPlots <- list(p1,p2,p3,p4,p5)
+weekSummPlots <- list(p1,p2,p3,p5) #removed p4 since there are no cat data
 
 
 #plot phenology-ontogeny landscape plotting
@@ -376,27 +394,36 @@ p7 <- p7+geom_label(label = dates)
 
 mw.locs$transect<-as.factor(mw.locs$transect)
 
-lowerleftlong=-121.765274
+lowerleftlong=-121.765
 lowerleftlat= 38.566483
-upperrightlong=-121.747067
+upperrightlong=-121.745
 upperrightlat= 38.576428
 
-NDC<-get_map(location=c(lowerleftlong,lowerleftlat,upperrightlong,upperrightlat),maptype="terrain",source="google")
+#NDC<-get_map(location=c(lon=-121.755162,lat=38.570702),zoom=15, maptype="terrain",source="google")
+
+NDC<-get_map(location=c(lowerleftlong, lowerleftlat, upperrightlong, upperrightlat), maptype="terrain",source="stamen")
+NDCmap<-ggmap(NDC, extent = "panel")
 
 #just the ones seen last week
 nw.locs.week <- mw.locs[match(unique(data[data$week==max(data$week) ,"milkweed.ID" ]) , mw.locs$name) , ]
 
-NDCmap<-ggmap(NDC, extent = "panel")
+nw.summ.by.plant<-data[data$week==max(data$week),c("total.stem.len","total.stem.area","milkweed.ID","nEggs","nLTotal","monarchLoad")]
+
+
 #this object is plotted directly in overall report script
-p8 <- NDCmap+geom_point(aes(x=longitude,y=latitude,color=transect),data=nw.locs.week)+ggtitle("Milkweeds surveyed last week")
+
+NDCmap+geom_point(aes(x=longitude,y=latitude,size=nw.summ.by.plant$monarchLoad,color=nw.summ.by.plant$total.stem.len),data=nw.locs.week)+theme(legend.position="bottom")+ggtitle("Milkweeds surveyed last week")+scale_size_continuous(name = "number of monarchs obs per plant")+scale_colour_continuous(name = "total stem length")
 
 #time of observations: day of week, time of day
-p9 <- qplot(weekdays(data$date.time))
-p10 <- qplot(data$date.time$hour)
+p9 <- qplot(factor(weekdays(data$date.time),levels=c("Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday")),xlab="day of the week")
+p10 <- qplot(data$date.time$hour, xlab="hour of the day")
 timePlots <- list(p9, p10)
+
+# create overall report ---------------------------------------------------
+
 
 #print report
 setwd("reports")
-render(input = "overall_report.Rmd", output_format = "pdf_document", 
+render(input = "overall_report.Rmd", output_format = "pdf_document",
        output_file = paste(format(Sys.time(), "%m-%d-%Y"), " overall report.pdf", sep = "" ))
 setwd("..")
