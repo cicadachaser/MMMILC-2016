@@ -33,6 +33,8 @@ do.call(grid.arrange, c(timePlots))
 ```{r, echo = FALSE, message = FALSE, warning=FALSE}
 #print the two big plots
 p7
-p8
+p8.1
+p8.2
+
 ```
 

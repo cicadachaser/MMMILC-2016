@@ -23,11 +23,18 @@ std.err <- function(x) sd(x[!is.na(x)])/sqrt(length(x[!is.na(x)]))
 #setwd and load data
 setwd("C:\\Users\\louie\\Documents\\GitHub\\MMMILC-2016") #LHY desktop
 
-#load fake data, change the directory for the real data
+#load data
 setwd("2016 data") 
 mw.locs<-read.csv("milkweed coordinates 2015-05-23.csv")
-data<-read.csv("2016 MMMILC Project Data 2016-04-04.csv",header=T,strip.white=T,na.strings= c(" ", "")) #observations
+data<-read.csv("2016 MMMILC Project Data 2016-04-12.csv",header=T,strip.white=T,na.strings= c(" ", "")) #observations
 setwd("..")
+
+# #remove all observations of plants that were replanted in 2016; it might be okay to use these, but they were planted in early April 2016
+#replanted.2016<-data[grep("replanted",data$notes),"milkweed.ID"]
+# data<-data[!data$milkweed.ID %in% replanted.2016,]
+
+#alternatively, just remove the 50 replanting obs themselves 
+data<-data[-grep("replanted",data$notes),]
 
 #milkweed status to character  and monarch stage columns to character
 data$milkweed.status<-as.character(data$milkweed.status)
@@ -44,12 +51,13 @@ data$leaf.damage <- as.numeric(gsub("%", "", data$leaf.damage))
 #date and time to date.time object
 data$date.time <- strptime(paste(data$date, data$time), format = "%m/%d/%Y %H:%M")
 data$julianDate <- as.numeric(strftime(data$date.time, format = "%j"))
+data$date<-as.Date(data$date, "%m/%d/%Y")
 
 #re-order dataset in chronological order within teams
 data<-data[order(data$name.1,data$date.time),]
 
 #calculate the project.day and week
-data$project.day <- data$julianDate - min(data$julianDate) + 1
+data$project.day<-julian(data$date,origin=as.Date("2016-03-28"))+1
 data$week<-as.integer((data$project.day-1) %/% 7+1)
 
 #####
@@ -111,12 +119,12 @@ data$L5lengths <- sapply(1:nrow(data), function(x) c(monarchLengths[ x , which(g
 
 data$catLengths <- sapply(1:nrow(data), function(x) c(monarchLengths[ x , which(grepl("[L1-5]", monarchStages[x , ]))]))
 
-#how many of the plants are NE?
-prop.ne.fun<-function (x) {sum(x=="N.E.")/length(x)}
-prop.ne.summ<-aggregate(milkweed.status~milkweed.ID, data=data, prop.ne.fun)
-colnames(prop.ne.summ)<-c("milkweed.ID","prop.ne")
-p1<- ggplot(prop.ne.summ, aes (x=milkweed.ID, y=prop.ne))
-p1+geom_point(aes(color=prop.ne,size=prop.ne))+scale_color_gradientn(colors=c("green","red"))
+# #how many of the plants are NE?
+# prop.ne.fun<-function (x) {sum(x=="N.E.")/length(x)}
+# prop.ne.summ<-aggregate(milkweed.status~milkweed.ID, data=data, prop.ne.fun)
+# colnames(prop.ne.summ)<-c("milkweed.ID","prop.ne")
+# p1<- ggplot(prop.ne.summ, aes (x=milkweed.ID, y=prop.ne))
+# p1+geom_point(aes(color=prop.ne,size=prop.ne))+scale_color_gradientn(colors=c("green","red"))
 
 # calculate participant metrics -------------------------------------------
 
@@ -233,7 +241,7 @@ student.summary(as.character(data$name.1[1]))
 
 #apply the function of all students, and create student reports
 #make a list of names, remove NA value
-name.list <- unique(c(as.character(data$name.1), as.character(data$name.2)), as.character(data$name.3))
+name.list <- unique(c(as.character(data$name.1), as.character(data$name.2), as.character(data$name.3)))
 name.list <- sort(name.list[!is.na(name.list)])
 
 #apply student.summary function to all students, create a data frame form the result
@@ -258,19 +266,19 @@ last.week <- paste("week", " ", max(data$week), ": ", last.week[1], " - ",last.w
 
 ##################################################  
 
-# # create student reports --------------------------------------------------
-# 
-# 
-# #go to reports folder
-# setwd("reports")
-# 
-# for(i in 1:length(name.list)){
-#   student.name <- name.list[i]
-#   render(input = "student_report.Rmd", output_format = "pdf_document",
-#          output_file = file.names.list[i] )
-# }
-# 
-# setwd("..")
+# create student reports --------------------------------------------------
+
+
+#go to reports folder
+setwd("reports")
+
+for(i in 1:length(name.list)){
+  student.name <- name.list[i]
+  render(input = "student_report.Rmd", output_format = "pdf_document",
+         output_file = file.names.list[i])
+}
+
+setwd("..")
 
 # calculate overall metrics -----------------------------------------------
 
@@ -354,8 +362,7 @@ p4 <- p4+scale_x_continuous(breaks=c(1:max(data$week)))+ylab("avg catepillar (mm
 #plot egg counts by week
 eggs.by.week<-aggregate(nEggs~week,sum,data=data)
 p5 <- ggplot(eggs.by.week, aes(x=week, y=nEggs))
-p5 <- p5+geom_point(col="red")+geom_line()+geom_hline(yintercept=318,lty='dashed')+coord_cartesian(ylim = c(0, 50))+
-  scale_x_continuous(breaks=c(1:max(data$week)))+ylab("Eggs per week")
+p5 <- p5+geom_point(col="red")+geom_line()+scale_x_continuous(breaks=c(1:max(data$week)))+ylab("Eggs per week")
 
 #plot larvae counts by week
 larvae.by.week<-aggregate(nLTotal~week,sum,data=data)
@@ -405,14 +412,19 @@ NDC<-get_map(location=c(lowerleftlong, lowerleftlat, upperrightlong, upperrightl
 NDCmap<-ggmap(NDC, extent = "panel")
 
 #just the ones seen last week
-nw.locs.week <- mw.locs[match(unique(data[data$week==max(data$week) ,"milkweed.ID" ]) , mw.locs$name) , ]
 
-nw.summ.by.plant<-data[data$week==max(data$week),c("total.stem.len","total.stem.area","milkweed.ID","nEggs","nLTotal","monarchLoad")]
+nw.locs.previous.week <- mw.locs[match(unique(data[data$week==max(data$week)-1 ,"milkweed.ID" ]) , mw.locs$name) , ]
+nw.summ.by.plant.previous.week<-data[data$week==max(data$week)-1,c("total.stem.len","total.stem.area","milkweed.ID","nEggs","nLTotal","monarchLoad")]
+
+nw.locs.max.week <- mw.locs[match(unique(data[data$week==max(data$week) ,"milkweed.ID" ]) , mw.locs$name) , ]
+nw.summ.by.plant.max.week<-data[data$week==max(data$week),c("total.stem.len","total.stem.area","milkweed.ID","nEggs","nLTotal","monarchLoad")]
 
 
 #this object is plotted directly in overall report script
 
-NDCmap+geom_point(aes(x=longitude,y=latitude,size=nw.summ.by.plant$monarchLoad,color=nw.summ.by.plant$total.stem.len),data=nw.locs.week)+theme(legend.position="bottom")+ggtitle("Milkweeds surveyed last week")+scale_size_continuous(name = "number of monarchs obs per plant")+scale_colour_continuous(name = "total stem length")
+p8.1<-NDCmap+geom_point(aes(x=longitude,y=latitude,color=nw.summ.by.plant.previous.week$monarchLoad, size=nw.summ.by.plant.previous.week$total.stem.len, alpha=0.5),data=nw.locs.previous.week)+theme(legend.position="bottom")+ggtitle("Milkweeds surveyed in the previous week")+scale_color_continuous(name = "number of monarchs obs per plant",low="green",high="red")+scale_size_continuous(name = "total stem length")+guides(alpha=F)
+
+p8.2<-NDCmap+geom_point(aes(x=longitude,y=latitude,color=nw.summ.by.plant.max.week$monarchLoad, size=nw.summ.by.plant.max.week$total.stem.len, alpha=0.5),data=nw.locs.max.week)+theme(legend.position="bottom")+ggtitle("Milkweeds surveyed last week")+scale_color_continuous(name = "number of monarchs obs per plant",low="green",high="red")+scale_size_continuous(name = "total stem length")+guides(alpha=F)
 
 #time of observations: day of week, time of day
 p9 <- qplot(factor(weekdays(data$date.time),levels=c("Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday")),xlab="day of the week")
