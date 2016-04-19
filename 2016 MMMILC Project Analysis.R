@@ -26,7 +26,7 @@ setwd("C:\\Users\\louie\\Documents\\GitHub\\MMMILC-2016") #LHY desktop
 #load data
 setwd("2016 data") 
 mw.locs<-read.csv("milkweed coordinates 2015-05-23.csv")
-data<-read.csv("2016 MMMILC Project Data 2016-04-12.csv",header=T,strip.white=T,na.strings= c(" ", "")) #observations
+data<-read.csv("2016 MMMILC Project Data 2016-04-18.csv",header=T,strip.white=T,na.strings= c(" ", "")) #observations
 setwd("..")
 
 # #remove all observations of plants that were replanted in 2016; it might be okay to use these, but they were planted in early April 2016
@@ -53,12 +53,11 @@ data$date.time <- strptime(paste(data$date, data$time), format = "%m/%d/%Y %H:%M
 data$julianDate <- as.numeric(strftime(data$date.time, format = "%j"))
 data$date<-as.Date(data$date, "%m/%d/%Y")
 
-#re-order dataset in chronological order within teams
-data<-data[order(data$name.1,data$date.time),]
-
 #calculate the project.day and week
 data$project.day<-julian(data$date,origin=as.Date("2016-03-28"))+1
 data$week<-as.integer((data$project.day-1) %/% 7+1)
+
+
 
 #####
 #need to create a proabable time spent on each milkweed
@@ -67,12 +66,13 @@ data$week<-as.integer((data$project.day-1) %/% 7+1)
 #calculate the diff between given milkweed and following milkweed (if observers equal, if not then 4 min)
 #if the difference is more than 15 minutes or less than 0 minutes, make the elapsed time 4 minutes
 #this accounts for lunch breaks, different trips, final plant observed by that team (all elapsed times we cannot know)
-data <- data[order(paste(data$name.1, data$name.2, data$name.3), data$date.time) , ]
+#re-order dataset in chronological order within teams within weeks
+data <- data[order(data$week,paste(data$name.1, data$name.2, data$name.3), data$date.time) , ]
 rawTimes <- difftime(c(data$date.time[-1], min(data$date.time)), data$date.time, units = "mins")
 data$elapsedTime <- ifelse(rawTimes>0&rawTimes<15, rawTimes, 4)
 
 #order by date, then by milkweed.ID
-data<-data[order(data$date, data$milkweed.ID),]
+#data<-data[order(data$date, data$milkweed.ID),]
 
 #cleaning object data
 #any observations 0 percent.green, but ALIVE status. replace with DEAD
@@ -237,6 +237,7 @@ student.summary <- function(student.name){
   #plot individual student plots (commented out to silence output when all are run together)
   # do.call(grid.arrange, c(compare.plots[[student.name]], student.plots[[student.name]]))
 }
+
 student.summary(as.character(data$name.1[1]))
 
 #apply the function of all students, and create student reports
