@@ -36,7 +36,7 @@ setwd("..")
 #alternatively, just remove the 50 replanting obs themselves 
 data<-data[-grep("replanted",data$notes),]
 
-#milkweed status to character  and monarch stage columns to character
+#milkweed status to character and monarch stage columns to character
 data$milkweed.status<-as.character(data$milkweed.status)
 data[,"monarch1.stage"] <- as.character(data[,"monarch1.stage"] )
 data[,"monarch2.stage"] <- as.character(data[,"monarch2.stage"] )
@@ -57,8 +57,6 @@ data$date<-as.Date(data$date, "%m/%d/%Y")
 data$project.day<-julian(data$date,origin=as.Date("2016-03-28"))+1
 data$week<-as.integer((data$project.day-1) %/% 7+1)
 
-
-
 #####
 #need to create a proabable time spent on each milkweed
 #order by paste(name.1, name.2, name.3)
@@ -67,11 +65,15 @@ data$week<-as.integer((data$project.day-1) %/% 7+1)
 #if the difference is more than 15 minutes or less than 0 minutes, make the elapsed time 4 minutes
 #this accounts for lunch breaks, different trips, final plant observed by that team (all elapsed times we cannot know)
 #re-order dataset in chronological order within teams within weeks
-data <- data[order(data$week,paste(data$name.1, data$name.2, data$name.3), data$date.time) , ]
-rawTimes <- difftime(c(data$date.time[-1], min(data$date.time)), data$date.time, units = "mins")
-data$elapsedTime <- ifelse(rawTimes>0&rawTimes<15, rawTimes, 4)
 
-#order by date, then by milkweed.ID
+data$team<-paste(data$name.1, data$name.2, data$name.3)
+#count(data,vars="team")
+
+data <- data[order(data$week,data$team,data$date.time),]
+data$rawTimes <- difftime(c(data$date.time[-1], min(data$date.time)), data$date.time, units = "mins")
+data$elapsedTime <- ifelse(data$rawTimes>=0 & data$rawTimes<15, data$rawTimes, median(data$rawTimes))
+
+#order by date, then by milkweed.ID - is this necessary?
 #data<-data[order(data$date, data$milkweed.ID),]
 
 #cleaning object data
@@ -167,11 +169,9 @@ student.summary <- function(student.name){
   
   #make some plots, put them into a list to save for student reports
   #student monarch discovery rate compared to average
-  monarchProb <- sapply(unique(data$week), 
-                        function(x) sum (data[data$week == x , "nLTotal"]) / nrow(data[data$week == x ,]))
+  monarchProb <- sapply(unique(data$week),function(x) sum (data[data$week == x , "nLTotal"]) / nrow(data[data$week == x ,]))
   
-  studentMonarchProb <- sapply(unique(data$week), 
-                               function(x) sum (dStudent[dStudent$week == x , "nLTotal"]) / nrow(dStudent[dStudent$week == x ,]))
+  studentMonarchProb <- sapply(unique(data$week),function(x) sum (dStudent[dStudent$week == x , "nLTotal"]) / nrow(dStudent[dStudent$week == x ,]))
   
   monarchDetection <- data.frame(monarchProb = monarchProb, studentMonarchProb = studentMonarchProb)
   
