@@ -26,8 +26,11 @@ setwd("C:\\Users\\louie\\Documents\\GitHub\\MMMILC-2016") #LHY desktop
 #load data
 setwd("2016 data") 
 mw.locs<-read.csv("milkweed coordinates 2015-05-23.csv")
-data<-read.csv("2016 MMMILC Project Data 2016-04-18.csv",header=T,strip.white=T,na.strings= c(" ", "")) #observations
+data.previous<-read.csv("2016 MMMILC Project Data 2016-04-18.csv",header=T,strip.white=T,na.strings= c(" ", "")) #observations
+data<-read.csv("2016 MMMILC Project Data 2016-04-26.csv",header=T,strip.white=T,na.strings= c(" ", "")) #observations
 setwd("..")
+
+data<-rbind(data,data.previous)
 
 # #remove all observations of plants that were replanted in 2016; it might be okay to use these, but they were planted in early April 2016
 #replanted.2016<-data[grep("replanted",data$notes),"milkweed.ID"]
@@ -56,6 +59,7 @@ data$date<-as.Date(data$date, "%m/%d/%Y")
 #calculate the project.day and week
 data$project.day<-julian(data$date,origin=as.Date("2016-03-28"))+1
 data$week<-as.integer((data$project.day-1) %/% 7+1)
+count(data,vars="week")
 
 #####
 #need to create a proabable time spent on each milkweed
@@ -190,7 +194,8 @@ student.summary <- function(student.name){
   p2 <- p2 + geom_point(size = 3,data = eggDetection, aes(y = studentEggProb), colour = "red" )
   
   #time per plant by week, average vs student
-  weeklyStudentAvg <- with(dStudent, tapply(elapsedTime, INDEX = week, FUN = mean))
+  dStudentExp <- merge(all.y = TRUE , dStudent , data.frame("week" = unique(data$week)))
+  weeklyStudentAvg <- with(dStudentExp, tapply(elapsedTime, INDEX = week, FUN = mean))
   weeklyTimeAvg <- with(data, tapply(elapsedTime, INDEX = week, FUN = mean))
   
   timeDevotion <- data.frame(weeklyTimeAvg, weeklyStudentAvg)
@@ -372,7 +377,7 @@ p6 <- p6+geom_point(col="red")+geom_line()+geom_hline(yintercept=318,lty='dashed
   scale_x_continuous(breaks=c(1:max(data$week)))+ylab("Larvae per week")
 
 #put weekly plots together for overall report
-weekSummPlots <- list(p1,p2,p3,p5) #removed p4 since there are no cat data
+weekSummPlots <- list(p1,p2,p3,p5,p6,p4) #removed p4 since there are no cat data
 
 
 #plot phenology-ontogeny landscape plotting

@@ -1,6 +1,6 @@
 ---
 title: "MMMILC Summary Report"
-subtitle: "\"Be brave. Take risks. Nothing can substitute experience\". -Paulo Coelho"
+subtitle: "\"If we knew what we were doing, it wouldn't be called research.\". -Albert Einstein"
 output: pdf_document
 date: '`r Sys.time()`'
 ---
