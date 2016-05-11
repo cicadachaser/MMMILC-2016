@@ -1,5 +1,7 @@
 #This is an R script to analyze the MMMILC Project data from 2016
 
+start<-proc.time()
+
 # header info -------------------------------------------------------------
 
 #clear all variables
@@ -131,6 +133,8 @@ data$catLengths <- sapply(1:nrow(data), function(x) c(monarchLengths[ x , which(
 # colnames(prop.ne.summ)<-c("milkweed.ID","prop.ne")
 # p1<- ggplot(prop.ne.summ, aes (x=milkweed.ID, y=prop.ne))
 # p1+geom_point(aes(color=prop.ne,size=prop.ne))+scale_color_gradientn(colors=c("green","red"))
+
+
 
 # calculate participant metrics -------------------------------------------
 
@@ -445,3 +449,5 @@ setwd("reports")
 render(input = "overall_report.Rmd", output_format = "pdf_document",
        output_file = paste(format(Sys.time(), "%m-%d-%Y"), " overall report.pdf", sep = "" ))
 setwd("..")
+
+proc.time()-start
