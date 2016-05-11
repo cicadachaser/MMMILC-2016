@@ -28,8 +28,8 @@ setwd("C:\\Users\\louie\\Documents\\GitHub\\MMMILC-2016") #LHY desktop
 #load data
 setwd("2016 data") 
 mw.locs<-read.csv("milkweed coordinates 2015-05-23.csv")
-data.previous<-read.csv("2016 MMMILC Project Data 2016-04-18.csv",header=T,strip.white=T,na.strings= c(" ", "")) #observations
-data<-read.csv("2016 MMMILC Project Data 2016-04-26.csv",header=T,strip.white=T,na.strings= c(" ", "")) #observations
+data.previous<-read.csv("2016 MMMILC Project Data Weeks 1-3.csv",header=T,strip.white=T,na.strings= c(" ", "")) #observations
+data<-read.csv("2016 MMMILC Project Data 2016-05-11.csv",header=T,strip.white=T,na.strings= c(" ", "")) #observations
 setwd("..")
 
 data<-rbind(data,data.previous)
@@ -40,6 +40,9 @@ data<-rbind(data,data.previous)
 
 #alternatively, just remove the 50 replanting obs themselves 
 data<-data[-grep("replanted",data$notes),]
+
+#remove duplicate data from Week 6
+data<-data[!(data$date=="5/6/2016" & data$name.1=="Scott Soderquist" & data$name.2=="Alex Preisler"),]
 
 #milkweed status to character and monarch stage columns to character
 data$milkweed.status<-as.character(data$milkweed.status)
@@ -352,6 +355,24 @@ data$mean.dia<-rowMeans(data[,which(colnames(data)=="dia.1"):which(colnames(data
 data$total.stem.len<-data$stem.count*data$mean.len
 data$total.stem.area<-data$stem.count*data$mean.dia^2*pi
 
+# in week 6, plants 474-488 were measured twice. This gave us the opportunity see how comparable the two sets of obs were!
+# dups<-data[which(data$week==6 & data$milkweed.ID>=474 & data$milkweed.ID<=488),]
+# dups<-dups[order(dups$milkweed.ID),]
+# 
+# lm.dups.len<-lm(dups[dups$julianDate==127,"total.stem.len"]~dups[dups$julianDate==129,"total.stem.len"])
+# summary(lm.dups.len)
+# plot(dups[dups$julianDate==129,"total.stem.len"],dups[dups$julianDate==127,"total.stem.len"])
+# abline(lm.dups.len)
+# title("Two observer teams on the same plants had pretty similar length measurements")
+# text(30,60,"Adj R-squared:  0.9115, F-statistic: 93.67 on 1 and 8 DF,  p-value: 1.083e-05",cex=0.75)
+# 
+# lm.dups.area<-lm(dups[dups$julianDate==127,"total.stem.area"]~dups[dups$julianDate==129,"total.stem.area"])
+# summary(lm.dups.area)
+# plot(dups[dups$julianDate==129,"total.stem.area"],dups[dups$julianDate==127,"total.stem.area"])
+# abline(lm.dups.area)
+# title("Two observer teams on the same plants had pretty similar area measurements")
+# text(60,10,"Adj R-squared:  0.7246, F-statistic: 24.68 on 1 and 8 DF,  p-value: 0.001096",cex=0.75)
+
 #plant size by week
 total.stem.len.by.week<-aggregate(total.stem.len~week,function(x) c(mean=mean(x),se=std.err(x)),data=data)
 total.stem.area.by.week<-aggregate(total.stem.area~week,function(x) c(mean=mean(x),se=std.err(x)),data=data);total.stem.area.by.week
@@ -366,7 +387,7 @@ catLength.by.week<- as.data.frame(with( data, tapply(catLengths , week ,function
 catLength.by.week$week <- 1:nrow(catLength.by.week)
 colnames(catLength.by.week)[1]<-"mean"
 p4 <- ggplot(data=catLength.by.week)
-p4 <- p4+geom_point(aes(x=catLength.by.week[,"week"], y=catLength.by.week[,"mean"]), col="purple")
+p4 <- p4+geom_point(aes(x=week, y=catLength.by.week[,"mean"]), col="purple")
 p4 <- p4+scale_x_continuous(breaks=c(1:max(data$week)))+ylab("avg catepillar (mm)") + geom_line(aes(x=catLength.by.week[,"week"], y=catLength.by.week[,"mean"]))
 
 #plot egg counts by week
@@ -381,7 +402,7 @@ p6 <- p6+geom_point(col="red")+geom_line()+geom_hline(yintercept=318,lty='dashed
   scale_x_continuous(breaks=c(1:max(data$week)))+ylab("Larvae per week")
 
 #put weekly plots together for overall report
-weekSummPlots <- list(p1,p2,p3,p5,p6,p4) #removed p4 since there are no cat data
+weekSummPlots <- list(p1,p2,p3,p5,p6,p4) 
 
 
 #plot phenology-ontogeny landscape plotting
@@ -400,7 +421,7 @@ plant.se <-  as.numeric(tapply(data$total.stem.area ,  cut(data$date.time, "2 we
 
 dates <- as.character(format( as.Date(sort(unique(cut(data$date.time, "2 weeks")))) , format = "%m-%d"))
 
-phenOntD <- as.data.frame(cbind(cat.length, cat.se, plant.area, plant.se, dates))
+phenOntD <- as.data.frame(cbind.data.frame(cat.length, cat.se, plant.area, plant.se, dates))
 #this object is plotted directly in overall report script
 p7 <- ggplot(data = phenOntD, aes(x = cat.length, y = plant.area)) + geom_path() + geom_point(col = "forestgreen") +ggtitle("Phenology Ontogeny landscape")
 p7 <- p7+geom_label(label = dates)
