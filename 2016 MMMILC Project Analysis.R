@@ -28,11 +28,13 @@ setwd("C:\\Users\\louie\\Documents\\GitHub\\MMMILC-2016") #LHY desktop
 #load data
 setwd("2016 data") 
 mw.locs<-read.csv("milkweed coordinates 2015-05-23.csv")
-data.previous<-read.csv("2016 MMMILC Project Data Weeks 1-3.csv",header=T,strip.white=T,na.strings= c(" ", "")) #observations
-data<-read.csv("2016 MMMILC Project Data 2016-05-11.csv",header=T,strip.white=T,na.strings= c(" ", "")) #observations
+data.first<-read.csv("2016 MMMILC Project Data Weeks 1-3.csv",header=T,strip.white=T,na.strings= c(" ", "")) #observations
+data.second<-read.csv("2016 MMMILC Project Data Weeks 4-6.csv",header=T,strip.white=T,na.strings= c(" ", "")) #observations
+data.third<-read.csv("2016 MMMILC Project Data Weeks 7-9.csv",header=T,strip.white=T,na.strings= c(" ", "")) #observations
+data.fourth<-read.csv("2016 MMMILC Project Data 2016-06-14.csv",header=T,strip.white=T,na.strings= c(" ", "")) #observations
 setwd("..")
 
-data<-rbind(data,data.previous)
+data<-rbind(data.third,data.first,data.second,data.fourth)
 
 # #remove all observations of plants that were replanted in 2016; it might be okay to use these, but they were planted in early April 2016
 #replanted.2016<-data[grep("replanted",data$notes),"milkweed.ID"]
@@ -65,6 +67,9 @@ data$date<-as.Date(data$date, "%m/%d/%Y")
 data$project.day<-julian(data$date,origin=as.Date("2016-03-28"))+1
 data$week<-as.integer((data$project.day-1) %/% 7+1)
 count(data,vars="week")
+
+#remove data from the current week
+data<-data[data$week<11,]
 
 #####
 #need to create a proabable time spent on each milkweed
@@ -321,19 +326,15 @@ lastWeek <- summary.table(dataToSumm = data[data$week == max(data$week, na.rm = 
 summStats <- rbind("overall" = overall, "lastWeek" = lastWeek)
 
 #status counts
-weekStatus <-table( data$week, data$milkweed.status )
-weekStatus <- cbind(weekStatus , "total" = rowSums(weekStatus))
-overallStatus <- table(data$milkweedStatus)
+weekStatus <-table( data$week, data$milkweed.status)
+weekStatus <- cbind("week"=unique(data$week),weekStatus , "total" = rowSums(weekStatus))
 status.table <- tail(weekStatus, 10) #last x weeks
-#this object goes to report
-status.table <- rbind(weekStatus, overallStatus)
 
 #overall student rankings
 #this object goes to report
 rankTable <- as.data.frame( t( student.df[, -ncol(student.df) ]) )
 rankTable <- rankTable[ order(unlist(rankTable$totalPlants) , decreasing = TRUE), ]
 rankTable <- head(rankTable, 20) #top x students in # plants obs
-
 
 #plots
 #milkweed count by week

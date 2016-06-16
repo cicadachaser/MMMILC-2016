@@ -1,6 +1,8 @@
 ---
 title: "MMMILC Summary Report"
-subtitle: "\"A person can always find a career in a calling, but it is far more difficult later in life to find a calling in a career.\" -David Orr"
+subtitle: "\"To understand the heart and mind of a person, look not at what he has already achieved, but at what he aspires to do.\" -Kahlil Gibran"
+subtitle2: "\"Jump, and you will find out how to unfold your wings as you fall.\" -Ray Bradbury" 
+subtitle3: "\"Trust thyself.\" -Ralph Waldo Emerson"
 output: pdf_document
 date: '`r Sys.time()`'
 ---
