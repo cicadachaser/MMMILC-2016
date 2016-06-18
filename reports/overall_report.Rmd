@@ -1,8 +1,6 @@
 ---
 title: "MMMILC Summary Report"
-subtitle: "\"To understand the heart and mind of a person, look not at what he has already achieved, but at what he aspires to do.\" -Kahlil Gibran"
-subtitle2: "\"Jump, and you will find out how to unfold your wings as you fall.\" -Ray Bradbury" 
-subtitle3: "\"Trust thyself.\" -Ralph Waldo Emerson"
+subtitle: "\"In the beginner's mind there are many possibilities, in the expert's mind there are few.\" -Shunryu Suzuki" 
 output: pdf_document
 date: '`r Sys.time()`'
 ---
@@ -27,11 +25,11 @@ kable(rankTable, caption = "Student Summary")
 do.call(grid.arrange, c(weekSummPlots))
 
 ```
-```{r, echo = FALSE, message = FALSE, warning=FALSE}
-#print the two time plots
-do.call(grid.arrange, c(timePlots))
-
-```
+# ```{r, echo = FALSE, message = FALSE, warning=FALSE}
+# #print the two time plots
+# do.call(grid.arrange, c(timePlots))
+# 
+# ```
 ```{r, echo = FALSE, message = FALSE, warning=FALSE}
 #print the two big plots
 p7
