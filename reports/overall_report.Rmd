@@ -25,11 +25,11 @@ kable(rankTable, caption = "Student Summary")
 do.call(grid.arrange, c(weekSummPlots))
 
 ```
-# ```{r, echo = FALSE, message = FALSE, warning=FALSE}
-# #print the two time plots
-# do.call(grid.arrange, c(timePlots))
-# 
-# ```
+```{r, echo = FALSE, message = FALSE, warning=FALSE}
+#print the two time plots
+#do.call(grid.arrange, c(timePlots))
+ 
+```
 ```{r, echo = FALSE, message = FALSE, warning=FALSE}
 #print the two big plots
 p7

@@ -71,7 +71,7 @@ count(data,vars="week")
 #remove data from the current week
 data<-data[data$week<13,]
 
-#####
+#####s
 #need to create a proabable time spent on each milkweed
 #order by paste(name.1, name.2, name.3)
 #order by date.time
@@ -334,7 +334,7 @@ status.table <- tail(weekStatus, 10) #last x weeks
 #this object goes to report
 rankTable <- as.data.frame( t( student.df[, -ncol(student.df) ]) )
 rankTable <- rankTable[ order(unlist(rankTable$totalPlants) , decreasing = TRUE), ]
-rankTable <- head(rankTable, 20) #top x students in # plants obs
+rankTable <- head(rankTable, 50) #top x students in # plants obs
 
 #plots
 #milkweed count by week
