@@ -31,7 +31,7 @@ mw.locs<-read.csv("milkweed coordinates 2015-05-23.csv")
 data.first<-read.csv("2016 MMMILC Project Data Weeks 1-3.csv",header=T,strip.white=T,na.strings= c(" ", "")) #observations
 data.second<-read.csv("2016 MMMILC Project Data Weeks 4-6.csv",header=T,strip.white=T,na.strings= c(" ", "")) #observations
 data.third<-read.csv("2016 MMMILC Project Data Weeks 7-9.csv",header=T,strip.white=T,na.strings= c(" ", "")) #observations
-data.fourth<-read.csv("2016 MMMILC Project Data 2016-06-17.csv",header=T,strip.white=T,na.strings= c(" ", "")) #observations
+data.fourth<-read.csv("2016 MMMILC Project Data 2016-06-27.csv",header=T,strip.white=T,na.strings= c(" ", "")) #observations
 setwd("..")
 
 data<-rbind(data.third,data.first,data.second,data.fourth)
@@ -69,7 +69,7 @@ data$week<-as.integer((data$project.day-1) %/% 7+1)
 count(data,vars="week")
 
 #remove data from the current week
-data<-data[data$week<13,]
+data<-data[data$week<14,]
 
 #####s
 #need to create a proabable time spent on each milkweed
