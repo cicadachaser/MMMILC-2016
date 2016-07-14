@@ -1,6 +1,6 @@
 ---
 title: "MMMILC Summary Report"
-subtitle: "\"The greatest obstacle to discovery is not ignorance - it is the illusion of knowledge.\" -Daniel J. Boorstin" 
+subtitle: "\"Adopt the pace of nature: her secret is patience.\" Ralph Waldo Emerson"
 output: pdf_document
 date: '`r Sys.time()`'
 ---
