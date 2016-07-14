@@ -1,6 +1,6 @@
 ---
 title: "MMMILC Summary Report"
-subtitle: "\"Adopt the pace of nature: her secret is patience.\" Ralph Waldo Emerson"
+subtitle: "\"Dare to be naïve.\" -Buckminster Fuller"
 output: pdf_document
 date: '`r Sys.time()`'
 ---

@@ -1,13 +1,12 @@
 #This is an R script to analyze the MMMILC Project data from 2016
 
-start<-proc.time()
-
 # header info -------------------------------------------------------------
 
 #clear all variables
 rm(list=ls())
 graphics.off()
 pardefault <- par(no.readonly = T)
+start<-proc.time()
 
 #load packages, 
 library(ggplot2)
@@ -32,7 +31,7 @@ data.first<-read.csv("2016 MMMILC Project Data Weeks 1-3.csv",header=T,strip.whi
 data.second<-read.csv("2016 MMMILC Project Data Weeks 4-6.csv",header=T,strip.white=T,na.strings= c(" ", "")) #observations
 data.third<-read.csv("2016 MMMILC Project Data Weeks 7-9.csv",header=T,strip.white=T,na.strings= c(" ", "")) #observations
 data.fourth<-read.csv("2016 MMMILC Project Data Weeks 10-12.csv",header=T,strip.white=T,na.strings= c(" ", "")) #observations
-data.fifth<-read.csv("2016 MMMILC Project Data 2016-07-02.csv",header=T,strip.white=T,na.strings= c(" ", "")) #observations
+data.fifth<-read.csv("2016 MMMILC Project Data Weeks 13-15.csv",header=T,strip.white=T,na.strings= c(" ", "")) #observations
 setwd("..")
 
 data<-rbind(data.third,data.first,data.second,data.fourth,data.fifth)
@@ -70,7 +69,7 @@ data$week<-as.integer((data$project.day-1) %/% 7+1)
 count(data,vars="week")
 
 #remove data from the current week
-data<-data[data$week<15,]
+data<-data[data$week<16,]
 
 #####s
 #need to create a proabable time spent on each milkweed
@@ -441,7 +440,7 @@ upperrightlat= 38.576428
 
 #NDC<-get_map(location=c(lon=-121.755162,lat=38.570702),zoom=15, maptype="terrain",source="google")
 
-NDC<-get_map(location=c(lowerleftlong, lowerleftlat, upperrightlong, upperrightlat), maptype="terrain",source="stamen")
+NDC<-get_map(location=c(lowerleftlong, lowerleftlat, upperrightlong, upperrightlat), maptype="terrain",source="google")
 NDCmap<-ggmap(NDC, extent = "panel")
 
 #just the ones seen last week
