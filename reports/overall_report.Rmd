@@ -1,6 +1,6 @@
 ---
 title: "MMMILC Summary Report"
-subtitle: "\"Dare to be naïve.\" -Buckminster Fuller"
+subtitle: "\"A desk is a dangerous place from which to watch the world.\" -John le Carr\é"
 output: pdf_document
 date: '`r Sys.time()`'
 ---
