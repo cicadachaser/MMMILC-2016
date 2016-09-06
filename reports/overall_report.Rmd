@@ -1,6 +1,6 @@
 ---
 title: "MMMILC Summary Report"
-subtitle: "\"Simplicity is the key to brilliance.\" -Bruce Lee"
+subtitle: "\"Trees and stones will teach you that which you can never learn from masters.\" -St. Benard of Clairvaux"
 output: pdf_document
 date: '`r Sys.time()`'
 ---

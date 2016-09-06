@@ -33,10 +33,11 @@ data.third<-read.csv("2016 MMMILC Project Data Weeks 7-9.csv",header=T,strip.whi
 data.fourth<-read.csv("2016 MMMILC Project Data Weeks 10-12.csv",header=T,strip.white=T,na.strings= c(" ", "")) #observations
 data.fifth<-read.csv("2016 MMMILC Project Data Weeks 13-15.csv",header=T,strip.white=T,na.strings= c(" ", "")) #observations
 data.sixth<-read.csv("2016 MMMILC Project Data Weeks 16-18.csv",header=T,strip.white=T,na.strings= c(" ", "")) #observations
-data.seventh<-read.csv("2016 MMMILC Project Data 2016-08-15.csv",header=T,strip.white=T,na.strings= c(" ", "")) #observations
+data.seventh<-read.csv("2016 MMMILC Project Data Weeks 19-21.csv",header=T,strip.white=T,na.strings= c(" ", "")) #observations
+data.eighth<-read.csv("2016 MMMILC Project Data 2016-09-05.csv",header=T,strip.white=T,na.strings= c(" ", "")) #observations
 setwd("..")
 
-data<-rbind(data.first,data.second,data.third,data.fourth,data.fifth,data.sixth,data.seventh)
+data<-rbind(data.first,data.second,data.third,data.fourth,data.fifth,data.sixth,data.seventh)#,data.eighth)
 
 # #remove all observations of plants that were replanted in 2016; it might be okay to use these, but they were planted in early April 2016
 #replanted.2016<-data[grep("replanted",data$notes),"milkweed.ID"]
@@ -71,7 +72,8 @@ data$week<-as.integer((data$project.day-1) %/% 7+1)
 count(data,vars="week")
 
 #remove data from the current week
-data<-data[data$week<21,]
+ta[data$week<23,]
+
 
 #####s
 #need to create a proabable time spent on each milkweed
