@@ -37,7 +37,7 @@ data.seventh<-read.csv("2016 MMMILC Project Data Weeks 19-21.csv",header=T,strip
 data.eighth<-read.csv("2016 MMMILC Project Data 2016-09-05.csv",header=T,strip.white=T,na.strings= c(" ", "")) #observations
 setwd("..")
 
-data<-rbind(data.first,data.second,data.third,data.fourth,data.fifth,data.sixth,data.seventh)#,data.eighth)
+data<-rbind(data.first,data.second,data.third,data.fourth,data.fifth,data.sixth,data.seventh,data.eighth)
 
 # #remove all observations of plants that were replanted in 2016; it might be okay to use these, but they were planted in early April 2016
 #replanted.2016<-data[grep("replanted",data$notes),"milkweed.ID"]
