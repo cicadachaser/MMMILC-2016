@@ -72,7 +72,8 @@ data$week<-as.integer((data$project.day-1) %/% 7+1)
 count(data,vars="week")
 
 #remove data from the current week
-data<-data[data$week<23,]
+ta[data$week<23,]
+
 
 #####s
 #need to create a proabable time spent on each milkweed
@@ -441,9 +442,9 @@ lowerleftlat= 38.566483
 upperrightlong=-121.745
 upperrightlat= 38.576428
 
-#NDC<-get_map(location=c(lon=-121.755162,lat=38.570702),zoom=15, maptype="terrain",source="google")
+NDC<-get_map(location=c(lon=-121.755162,lat=38.570702),zoom=15, maptype="terrain",source="google")
 
-NDC<-get_map(location=c(lowerleftlong, lowerleftlat, upperrightlong, upperrightlat), maptype="terrain",source="google")
+#NDC<-get_map(location=c(lowerleftlong, lowerleftlat, upperrightlong, upperrightlat), maptype="terrain",source="stamen")
 NDCmap<-ggmap(NDC, extent = "panel")
 
 #just the ones seen last week
