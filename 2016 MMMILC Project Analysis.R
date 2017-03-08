@@ -34,10 +34,13 @@ data.fourth<-read.csv("2016 MMMILC Project Data Weeks 10-12.csv",header=T,strip.
 data.fifth<-read.csv("2016 MMMILC Project Data Weeks 13-15.csv",header=T,strip.white=T,na.strings= c(" ", "")) #observations
 data.sixth<-read.csv("2016 MMMILC Project Data Weeks 16-18.csv",header=T,strip.white=T,na.strings= c(" ", "")) #observations
 data.seventh<-read.csv("2016 MMMILC Project Data Weeks 19-21.csv",header=T,strip.white=T,na.strings= c(" ", "")) #observations
-data.eighth<-read.csv("2016 MMMILC Project Data 2016-09-05.csv",header=T,strip.white=T,na.strings= c(" ", "")) #observations
+data.eighth<-read.csv("2016 MMMILC Project Data Weeks 22-24.csv",header=T,strip.white=T,na.strings= c(" ", "")) #observations
+data.ninth<-read.csv("2016 MMMILC Project Data Weeks 25-27.csv",header=T,strip.white=T,na.strings= c(" ", "")) #observations
+data.tenth<-read.csv("2016 MMMILC Project Data Weeks 28-30.csv",header=T,strip.white=T,na.strings= c(" ", "")) #observations
+data.eleventh<-read.csv("2016 MMMILC Project Data Weeks 31-32.csv",header=T,strip.white=T,na.strings= c(" ", "")) #observations
 setwd("..")
 
-data<-rbind(data.first,data.second,data.third,data.fourth,data.fifth,data.sixth,data.seventh,data.eighth)
+data<-rbind(data.first,data.second,data.third,data.fourth,data.fifth,data.sixth,data.seventh,data.eighth,data.ninth,data.tenth,data.eleventh)
 
 # #remove all observations of plants that were replanted in 2016; it might be okay to use these, but they were planted in early April 2016
 #replanted.2016<-data[grep("replanted",data$notes),"milkweed.ID"]
@@ -72,7 +75,7 @@ data$week<-as.integer((data$project.day-1) %/% 7+1)
 count(data,vars="week")
 
 #remove data from the current week
-ta[data$week<23,]
+#data[data$week<23,]
 
 
 #####s
